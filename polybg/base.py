@@ -1,14 +1,21 @@
 import random
+import operator as op
+from functools import reduce
 import numpy
 from math import cos, sin, pi
 from typing import Tuple
 from PIL import Image, ImageDraw
 
 
-def polygons(grid):
+def connect_polygons(grid):
     for j, row in enumerate(grid[:-1]):
         for i, coords in enumerate(row[:-1]):
             yield coords, row[i + 1], grid[j + 1][i + 1], grid[j + 1][i]
+
+
+def polygon_center(polygon):
+    total = reduce(op.add, polygon)
+    return total / len(polygon)
 
 
 class Rectangle:
@@ -37,7 +44,6 @@ class Rectangle:
     def shift_grid(
         self,
         shift_radius_interval: Tuple[int, int],
-        prec: int = 100,
     ) -> None:
         self.grid += numpy.array(  # Shift Intereior Vertices by random vectors
             [
@@ -48,9 +54,7 @@ class Rectangle:
                     else numpy.array(
                         [
                             (shift_radius := random.randint(*shift_radius_interval))
-                            * cos(
-                                angle := random.randint(0, int(2 * pi * prec)) / prec
-                            ),
+                            * cos(angle := random.random() * 2 * pi),
                             shift_radius * sin(angle),
                         ]
                     )
@@ -65,7 +69,7 @@ class Rectangle:
                         [
                             0,
                             random.randint(*shift_radius_interval)
-                            * sin(random.randint(0, int(2 * pi * prec)) / prec),
+                            * sin(random.random() * 2 * pi),
                         ]
                     )
                     if j not in {0, self.axis_frequencies[1]}
@@ -73,7 +77,7 @@ class Rectangle:
                     else numpy.array(
                         [
                             random.randint(*shift_radius_interval)
-                            * cos(random.randint(0, int(2 * pi * prec)) / prec),
+                            * cos(random.random() * 2 * pi),
                             0,
                         ]
                     )
@@ -86,17 +90,50 @@ class Rectangle:
             ]
         )
 
-    def view(self, path: str):
+    def color_gradient(
+        self,
+        polygons,
+        gradient: Tuple[Tuple[int, int, int], Tuple[int, int, int]],
+        sorted_key=None,
+    ):
+        start_color = numpy.array(gradient[0], dtype="float64")
+        end_color = numpy.array(gradient[1], dtype="float64")
+        delta_color = (end_color - start_color) / len(polygons)
+        print(delta_color)
+
+        if sorted_key is not None:
+            polygons = sorted(polygons, key=sorted_key)
+
+        for polygon in polygons:
+            yield polygon, tuple(map(int, start_color))
+            start_color += delta_color
+
+    def color_gradient_by_direction(
+        self,
+        polygons,
+        gradient: Tuple[Tuple[int, int, int], Tuple[int, int, int]],
+        angle: float,
+    ):
+        def direction_key(polygon):
+            center = polygon_center(polygon)
+            return cos(angle) * center[0] + sin(angle) * center[1]
+        yield from self.color_gradient(polygons, gradient, sorted_key=direction_key)
+
+    def view(
+        self,
+        path: str,
+        gradient: Tuple[Tuple[int, int, int], Tuple[int, int, int]],
+        angle: float = 0.0,
+    ):
         new = self.img.copy()
         draw = ImageDraw.Draw(new)
-        for polygon in polygons(self.grid):
+        polygons = tuple(connect_polygons(self.grid))
+        colored_polygons = self.color_gradient_by_direction(polygons, gradient, angle)
+
+        for polygon, color in colored_polygons:
             draw.polygon(
                 tuple(map(tuple, polygon)),
-                fill=(
-                    random.randint(0, 255),
-                    random.randint(0, 255),
-                    random.randint(0, 255),
-                ),
+                fill=color,
                 width=0,
             )
         new.save(path)

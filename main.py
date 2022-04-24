@@ -1,10 +1,12 @@
 from polybg.base import Rectangle
 
 
-shape = Rectangle((2000, 1500), (50, 50))
+shape = Rectangle((2000, 1500), (20, 15))
 
-shape.view("1.png")
+shape.shift_grid((0, 50))
 
-shape.shift_grid((0, 15), prec=10000)
-
-shape.view("2.png")
+shape.view(
+    "output.png",
+    gradient=((0,) * 3, (150,) * 3),
+    angle=3,
+)
