@@ -99,8 +99,6 @@ class Rectangle:
         start_color = numpy.array(gradient[0], dtype="float64")
         end_color = numpy.array(gradient[1], dtype="float64")
         delta_color = (end_color - start_color) / len(polygons)
-        print(delta_color)
-
         if sorted_key is not None:
             polygons = sorted(polygons, key=sorted_key)
 
@@ -117,6 +115,7 @@ class Rectangle:
         def direction_key(polygon):
             center = polygon_center(polygon)
             return cos(angle) * center[0] + sin(angle) * center[1]
+
         yield from self.color_gradient(polygons, gradient, sorted_key=direction_key)
 
     def view(
@@ -134,6 +133,5 @@ class Rectangle:
             draw.polygon(
                 tuple(map(tuple, polygon)),
                 fill=color,
-                width=0,
             )
         new.save(path)
