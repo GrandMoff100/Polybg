@@ -1,20 +1,28 @@
+import itertools
 from math import pi
-from random import random, randint
 from polybg.base import Rectangle
 
 
-for i in range(1000):
-    shape = Rectangle((1500, 1500), (20, 15))
+for i, (r1, g1, b1, r2, g2, b2, d_min, d_max, angle) in enumerate(itertools.product(
+    range(0, 256, 16),
+    range(0, 256, 16),
+    range(0, 256, 16),
+    range(0, 256, 16),
+    range(0, 256, 16),
+    range(0, 256, 16),
+    range(0, 20, 4), range(20, 50, 5),
+    range(0, 360, 45)
+)):
+    shape = Rectangle((1366, 768), (25, 20))
 
-    shape.shift_grid((randint(0,20), randint(20,50)))
-
-    r = lambda: randint(0, 255)
-
+    shape.shift_grid((d_min, d_max))
+    path = f"output/image{str(i).zfill(10)}.png"
+    print(path)
     shape.view(
-        f"output/image{str(i).zfill(4)}.png",
+        path,
         gradient=(
-            (r(), r(), r()),
-            (r(), r(), r()),
+            (r1, g1, b1),
+            (r2, g2, b2),
         ),
-        angle=random() * 2 * pi,
+        angle=angle / 360 * pi,
     )
