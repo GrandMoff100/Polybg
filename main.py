@@ -1,28 +1,37 @@
-import itertools
+import os
+import time
 from math import pi
+import random
 from polybg.base import Rectangle
 
 
-for i, (r1, g1, b1, r2, g2, b2, d_min, d_max, angle) in enumerate(itertools.product(
-    range(0, 256, 16),
-    range(0, 256, 16),
-    range(0, 256, 16),
-    range(0, 256, 16),
-    range(0, 256, 16),
-    range(0, 256, 16),
-    range(0, 20, 4), range(20, 50, 5),
-    range(0, 360, 45)
-)):
-    shape = Rectangle((1366, 768), (25, 20))
-
-    shape.shift_grid((d_min, d_max))
-    path = f"output/image{str(i).zfill(10)}.png"
-    print(path)
+def main(file, start_color, end_color) -> None:
+    shape = Rectangle((1366, 768), (31, 16))
+    shape.shift_grid((5, 20))
     shape.view(
-        path,
+        file,
         gradient=(
-            (r1, g1, b1),
-            (r2, g2, b2),
+            start_color,
+            end_color,
         ),
-        angle=angle / 360 * pi,
+        angle=random.randint(0, 4) * 45 / 180 * pi,
     )
+
+path = f"/home/nathan/Pictures/backgrounds/image-{int(time.time())}.png"
+
+main(
+    path,
+    [random.randint(0, 255) for _ in range(3)],
+    [random.randint(0, 255) for _ in range(3)]
+)
+
+os.system(
+    "/usr/bin/gsettings "
+    "set org.gnome.desktop.background "
+    f"picture-uri-dark file://{path}"
+)
+os.system(
+    "/usr/bin/gsettings "
+    "set org.gnome.desktop.background "
+    f"picture-uri file://{path}"
+)
