@@ -19,10 +19,21 @@ def main(file, start_color, end_color) -> None:
 
 path = f"{os.environ['HOME']}/Pictures/backgrounds/image-{int(time.time())}.png"
 
+colors = [
+    random.randint(0, 85) for _ in range(2)
+] + [
+    random.randint(86, 170) for _ in range(2)
+] + [
+    random.randint(171, 255) for _ in range(2)
+]
+
+random.shuffle(colors)
+
+
 main(
     path,
-    [random.randint(0, 255) for _ in range(3)],
-    [random.randint(0, 255) for _ in range(3)]
+    colors[0:3],
+    colors[3:6]
 )
-
 print(path, end="")
+
