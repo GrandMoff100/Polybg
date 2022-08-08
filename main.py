@@ -17,7 +17,7 @@ def main(file, start_color, end_color) -> None:
         angle=random.randint(0, 4) * 45 / 180 * pi,
     )
 
-path = f"~/Pictures/backgrounds/image-{int(time.time())}.png"
+path = f"{os.environ['HOME']}/Pictures/backgrounds/image-{int(time.time())}.png"
 
 main(
     path,
