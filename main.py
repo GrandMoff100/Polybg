@@ -17,7 +17,7 @@ def main(file, start_color, end_color) -> None:
         angle=random.randint(0, 4) * 45 / 180 * pi,
     )
 
-path = f"/home/nathan/Pictures/backgrounds/image-{int(time.time())}.png"
+path = f"~/Pictures/backgrounds/image-{int(time.time())}.png"
 
 main(
     path,
@@ -25,13 +25,4 @@ main(
     [random.randint(0, 255) for _ in range(3)]
 )
 
-os.system(
-    "/usr/bin/gsettings "
-    "set org.gnome.desktop.background "
-    f"picture-uri-dark file://{path}"
-)
-os.system(
-    "/usr/bin/gsettings "
-    "set org.gnome.desktop.background "
-    f"picture-uri file://{path}"
-)
+print(path, end="")
